@@ -7,10 +7,13 @@ import morgan from "morgan";
 import { errorHandler } from "./middlewares/errorHandler";
 import logger from "./utils/logger";
 import userRoutes from "./routes/userRoutes";
+import { setupSwagger } from "./config/swagger";
+import http from 'http';
+import { startLineChartServer } from './middlewares/socketHandler';
 
 dotenv.config(); // Load environment variables from .env file
 const port = process.env.PORT ?? 3000;
-const allowedOrigins = [`https://localhost:${port}`];
+const allowedOrigins = [`https://localhost:${port}`, `http://192.168.0.103`];
 const corsOptions = {
     origin: allowedOrigins, // Specify allowed origins
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -31,9 +34,16 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Express + TypeScript Server Rohan Kumar");
 });
 
+// Create an HTTP server
+const httpServer = http.createServer(app);
+
+// Initialize Socket.IO
+startLineChartServer(httpServer);
+
 // Use routes
 app.use('/api/users', userRoutes);
 
+setupSwagger(app); // Set up Swagger
 app.listen(port, () => {
     logger.info(`[server]: Server is running at http://localhost:${port}`);
 });

@@ -7,7 +7,10 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
     try {
         const { name, email, password } = req.body;
         const user = await userService.createUser({ name, email, password });
-        res.status(201).json({ success: true, data: user });
+        if (user?.errors[0].message)
+            res.status(500).json({ success: false, data: user?.errors[0].message });
+        else
+            res.status(201).json({ success: true, data: user });
     } catch (error) {
         next(error);
     }

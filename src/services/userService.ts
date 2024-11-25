@@ -8,6 +8,8 @@ export const createUser = async (userData: UserAttributes) => {
         const user = await User.create(userData, { transaction });
         logger.info(`User created: ${user.email}`);
         return user;
+    }).catch((error) => {
+        return error;
     });
 };
 
